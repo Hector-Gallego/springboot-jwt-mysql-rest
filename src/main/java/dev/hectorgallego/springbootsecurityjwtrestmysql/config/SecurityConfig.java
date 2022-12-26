@@ -76,8 +76,9 @@ public class SecurityConfig {
             .disable()
         )
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/login","/api/home").permitAll()//rutas permitidas
-            .requestMatchers(HttpMethod.POST, "/api/users").permitAll()//ruta permitida para el metodo POST
+            .requestMatchers("/api/login","/api/home","/api/roles").permitAll()//rutas permitidas
+            .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+            .requestMatchers(HttpMethod.GET,"/api/users").hasAnyAuthority("SCOPE_admin")//ruta permitida para el metodo POST
             .anyRequest().authenticated()
         )
         .userDetailsService(myUserDetailsService)//se suministra el userDetailService

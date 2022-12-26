@@ -1,11 +1,18 @@
 package dev.hectorgallego.springbootsecurityjwtrestmysql.model;
 
 
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
 @Table(name="users")
@@ -19,6 +26,15 @@ public class User {
     private String username;
     private String password;
     private String email;
+
+    
+    @ManyToMany(cascade={CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(  
+        name = "user_has_roles",
+        joinColumns= @JoinColumn(name="users_id"),
+        inverseJoinColumns = @JoinColumn(name="roles_id"),
+        uniqueConstraints = @UniqueConstraint(columnNames = {"users_id","roles_id"}))
+    private List<Role> roles;
 
 
     public User(){
@@ -54,6 +70,13 @@ public class User {
     }
     public void setEmail(String email) {
         this.email = email;
+    }
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
     }
 
     
