@@ -2,7 +2,6 @@ package dev.hectorgallego.springbootsecurityjwtrestmysql.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -76,9 +75,10 @@ public class SecurityConfig {
             .disable()
         )
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/login","/api/home","/api/roles").permitAll()//rutas permitidas
-            .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
-            .requestMatchers(HttpMethod.GET,"/api/users").hasAnyAuthority("SCOPE_admin")//ruta permitida para el metodo POST
+            .requestMatchers("/api/login","/api/home","/api/roles","/api/authorities").permitAll()//rutas permitidas
+            .requestMatchers("/api/users").permitAll()
+            .requestMatchers("/api/securityadmin").hasAnyAuthority("SCOPE_admin")
+            .requestMatchers("/api/securityuseradmin").hasAnyAuthority("SCOPE_admin","SCOPE_user")
             .anyRequest().authenticated()
         )
         .userDetailsService(myUserDetailsService)//se suministra el userDetailService

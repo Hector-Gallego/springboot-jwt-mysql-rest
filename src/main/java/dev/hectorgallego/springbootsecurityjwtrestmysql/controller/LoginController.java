@@ -1,5 +1,7 @@
 package dev.hectorgallego.springbootsecurityjwtrestmysql.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -22,8 +24,10 @@ public class LoginController {
 
     private TokenService tokenService;
     private AuthenticationManager authenticationManager;
+    private Logger logger = LoggerFactory.getLogger(LoginController.class);
 
     public LoginController(TokenService tokenService, AuthenticationManager authenticationManager) {
+        
         this.tokenService = tokenService;
         this.authenticationManager = authenticationManager;
     }
@@ -39,6 +43,10 @@ public class LoginController {
         * si llama al metodo generateToken de la clase TokenService y se le pasa por parametro la uthenticación
         * si la autenticación es correcta devuelve el token al usuario. 
         */ 
+        
+        logger.info("user recibido = " + login.username());
+        logger.info("password recibido = " + login.password());
+
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login.username(), login.password()));
         return tokenService.generateToken(authentication);
 
