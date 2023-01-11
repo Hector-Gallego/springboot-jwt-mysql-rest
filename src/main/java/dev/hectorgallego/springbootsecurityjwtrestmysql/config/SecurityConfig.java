@@ -1,5 +1,6 @@
 package dev.hectorgallego.springbootsecurityjwtrestmysql.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,10 +17,10 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-
-import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 
@@ -39,13 +40,20 @@ import dev.hectorgallego.springbootsecurityjwtrestmysql.service.MyUserDetailsSer
 public class SecurityConfig {
     
     // se inicializa en un metodo de la clase, por eso no se inyecta
-    private RSAKey rsaKey;
+  
+    @Autowired
+    private RsaKeyProperties rsaKeys;
+
+    
+   
 
     // se inyecta MyUserDetailService mediante Constructor
     private MyUserDetailsService myUserDetailsService;
     public SecurityConfig(MyUserDetailsService myUserDetailsService) {
         this.myUserDetailsService = myUserDetailsService;
     }
+
+   
 
 
     /*
@@ -76,7 +84,7 @@ public class SecurityConfig {
         )
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/api/login","/api/home","/api/roles","/api/authorities").permitAll()//rutas permitidas
-            .requestMatchers("/api/users").permitAll()
+            .requestMatchers("/api/users/**").permitAll()
             .requestMatchers("/api/securityadmin").hasAnyAuthority("SCOPE_admin")
             .requestMatchers("/api/securityuseradmin").hasAnyAuthority("SCOPE_admin","SCOPE_user")
             .anyRequest().authenticated()
@@ -94,24 +102,21 @@ public class SecurityConfig {
      * Este metodo de algun modo utiliza las llaves privadas y publicas
      * para la codificación del token
      */
+   
+
+     // metodo para la desencriptacion del token
     @Bean
-    public JWKSource<SecurityContext> jwkSource() {
-        rsaKey = Jwks.generateRSA();
-        JWKSet jwkSet = new JWKSet(rsaKey);
-        return (jwkSelector, securityContext) -> jwkSelector.select(jwkSet);
+    JwtDecoder jwtDecoder(){
+        return NimbusJwtDecoder.withPublicKey(rsaKeys.publicKey()).build();
     }
 
     // metodo para la encriptacion del token
     @Bean
-    JwtEncoder jwtEncoder(JWKSource<SecurityContext> jwks){
-        return new NimbusJwtEncoder(jwks);
-    }
-
-    // metodo para la desencriptacion del token
-    @Bean
-    JwtDecoder jwtDecoder(JWKSource<SecurityContext> jwks) throws JOSEException{
-        return NimbusJwtDecoder.withPublicKey(rsaKey.toRSAPublicKey()).build();
-    }
+	JwtEncoder jwtEncoder() {
+		JWK jwk = new RSAKey.Builder(rsaKeys.publicKey()).privateKey(rsaKeys.privateKey()).build();
+		JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
+		return new NimbusJwtEncoder(jwks);
+	}
 
     // algorithmo con el que se cifrara la contraseña de usuario 
     @Bean

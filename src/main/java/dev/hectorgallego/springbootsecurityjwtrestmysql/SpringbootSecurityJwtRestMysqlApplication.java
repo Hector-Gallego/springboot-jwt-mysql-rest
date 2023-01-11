@@ -8,12 +8,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
+
+import dev.hectorgallego.springbootsecurityjwtrestmysql.config.RsaKeyProperties;
 import dev.hectorgallego.springbootsecurityjwtrestmysql.model.Role;
 import dev.hectorgallego.springbootsecurityjwtrestmysql.model.User;
 import dev.hectorgallego.springbootsecurityjwtrestmysql.service.RoleService;
 import dev.hectorgallego.springbootsecurityjwtrestmysql.service.UserService;
 
+@EnableConfigurationProperties(RsaKeyProperties.class)
 @SpringBootApplication
 public class SpringbootSecurityJwtRestMysqlApplication {
 
@@ -62,6 +66,7 @@ class DemoCommandLineRunner implements CommandLineRunner{
 		userUser.setUsername("user");
 		userUser.setPassword("user");
 		userUser.setEmail("user@gmail.com");
+		userUser.setEnabled(true);
 		userUser.setRoles(rolesUser);
 
 		List<Role> rolesAdmin = new ArrayList<>();
@@ -73,6 +78,7 @@ class DemoCommandLineRunner implements CommandLineRunner{
 		userAdmin.setUsername("admin");
 		userAdmin.setPassword("admin");
 		userAdmin.setEmail("admin@gmail.com");
+		userAdmin.setEnabled(true);
 		userAdmin.setRoles(rolesAdmin);
 
 		userService.saveUser(userAdmin);

@@ -47,8 +47,14 @@ public class LoginController {
         logger.info("user recibido = " + login.username());
         logger.info("password recibido = " + login.password());
 
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login.username(), login.password()));
-        return tokenService.generateToken(authentication);
+        try{
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login.username(), login.password()));
+            return tokenService.generateToken(authentication);
+        }catch(Exception e){
+            e.printStackTrace();
+            return "problema al generar el token";
+        }
+       
 
     }
 

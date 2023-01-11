@@ -4,6 +4,7 @@ package dev.hectorgallego.springbootsecurityjwtrestmysql.model;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -27,7 +28,11 @@ public class User {
     private String password;
     private String email;
 
-    
+    @Column(name="verification_code", length = 64)
+    private String verificationCode;
+    private boolean enabled;
+
+
     @ManyToMany(cascade={CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(  
         name = "user_has_roles",
@@ -36,10 +41,6 @@ public class User {
         uniqueConstraints = @UniqueConstraint(columnNames = {"users_id","roles_id"}))
     private List<Role> roles;
 
-
-    public User(){
-
-    }
 
     public Long getId() {
         return id;
@@ -77,6 +78,21 @@ public class User {
 
     public void setRoles(List<Role> roles) {
         this.roles = roles;
+    }
+
+    public String getVerificationCode() {
+        return verificationCode;
+    }
+    public void setVerificationCode(String verificationCode) {
+        this.verificationCode = verificationCode;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     

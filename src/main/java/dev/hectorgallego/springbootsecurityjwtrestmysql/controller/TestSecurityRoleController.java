@@ -17,5 +17,10 @@ public class TestSecurityRoleController {
     public String security2(){
         return "Solo para usuarios y administradores";
     }
+
+    @GetMapping("/home")
+    public String home(){
+        return "home";
+    }
     
 }
